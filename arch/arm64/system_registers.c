@@ -84,16 +84,12 @@ static inline uint64_t *cpacr_el1_register_pointer(CPUState *env)
 
 static inline uint64_t mpidr_el1_register(CPUState *env)
 {
-    uint32_t affinity = tlib_get_mp_index();
-
-    // Aff3 is not located immediately after Aff2 in MPIDR
-    uint64_t aff3 = extract64(affinity, 24, 8) << 32;
-    uint32_t aff0_1_2 = extract32(affinity, 0, 24);
+    uint64_t affinity = tlib_get_mp_index(); // C# -> GetMpIndex()
 
     if (arm_current_el(env) == 1 && arm_is_el2_enabled(env)) {
-        return env->cp15.vmpidr_el2 | aff0_1_2 | aff3;
+        return env->cp15.vmpidr_el2 | affinity;
     }
-    return env->arm_core_config.mpidr | aff0_1_2 | aff3;
+    return env->arm_core_config.mpidr | affinity;
 }
 
 static inline uint64_t *spsr_el1_register_pointer(CPUState *env)
